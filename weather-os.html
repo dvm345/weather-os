@@ -914,12 +914,24 @@ window.addEventListener('scroll', hideTip, { passive: true });
 /* ================= init ================= */
 (function init() {
   const hs = $('hourInput');
-  for (let h = 0; h < 24; h++) { const o = document.createElement('option'); o.value = h; o.textContent = hr12(h); if (h === 12) o.selected = true; hs.appendChild(o); }
+  for (let h = 0; h < 24; h++) { 
+    const o = document.createElement('option'); 
+    o.value = h; 
+    o.textContent = hr12(h); 
+    if (h === 12) o.selected = true; 
+    hs.appendChild(o); 
+  }
+
   const de = $('dateInput');
-  const past = new Date(); past.setFullYear(past.getFullYear() - 25);
-  de.value = past.toISOString().slice(0, 10);
-  const mx = new Date(); mx.setDate(mx.getDate() - 5);
-  de.max = mx.toISOString().slice(0, 10);
+  // Calculate exactly 5 days ago in UTC (Open-Meteo ERA5 data delay)
+  const now = new Date();
+  const mx = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 5));
+  const latestDate = mx.toISOString().slice(0, 10);
+
+  // Set both max and default value to the most recent available date
+  de.max = latestDate;
+  de.value = latestDate;
+
   cityEl.value = 'Paris, France';
   locationDirty = false;
   fetchWeather();
