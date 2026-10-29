@@ -353,7 +353,7 @@ function heat(r) {
 }
 
 /* ================= state ================= */
-let loc = { name: 'Paris', country: 'France', lat: 48.8566, lon: 2.3522 };
+let loc = { name: 'Nairobi', country: 'Kenya', lat: -1.2864, lon: 36.8172 };
 let locationDirty = false;
 let D = null;           // loaded dataset (up to 60 days of hourly data ending on the selected date)
 let range = 'day';
@@ -949,7 +949,7 @@ window.addEventListener('scroll', hideTip, { passive: true });
   de.max = latestDate;
   de.value = latestDate;
 
-  cityEl.value = 'Paris, France';
+  cityEl.value = 'Nairobi, Kenya';
   locationDirty = false;
   fetchWeather();
 })();
