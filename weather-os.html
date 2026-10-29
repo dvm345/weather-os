@@ -484,7 +484,24 @@ async function fetchWeather() {
       const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${L.lat}&longitude=${L.lon}&start_date=${start}&end_date=${date}&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&timezone=auto`;
       const res = await fetch(url);
       if (!res.ok) {
-        let reason = ''; try { reason = (await res.json()).reason; } catch (e) {}
+        let reason = '';
+        try { 
+          const errJson = await res.json();
+          reason = errJson.reason || '';
+        } catch (e) {}
+      
+        // If the API specified the exact allowed end date, automatically sync to it
+        const match = reason.match(/to\s+(\d{4}-\d{2}-\d{2})/);
+        if (match) {
+          const apiMaxDate = match[1];
+          dateEl.max = apiMaxDate;
+          if (date > apiMaxDate) {
+            dateEl.value = apiMaxDate;
+            // Retry automatically once with the API's latest date
+            return fetchWeather();
+          }
+        }
+      
         throw new Error(res.status === 429 ? 'The free weather service is rate-limiting requests. Please wait a minute and try again.' : (reason || 'Could not fetch historical data for this date and location.'));
       }
       const j = await res.json(), h = j.hourly;
